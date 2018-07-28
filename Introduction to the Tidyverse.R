@@ -57,7 +57,36 @@ ggplot(by_year_continent, aes(x = year, y = medianGdpPercap,
   geom_point() +
   expand_limits(y = 0) # to make sure the plot's y-axis includes zero
 
-# 
+# Types of visualizations 
+
+## Create a bar plot showing medianGDP by continent
+by_continent <- gapminder %>%
+  filter(year == 1952) %>%
+  group_by(continent) %>%
+  summarise(medianGdpPercap = median(gdpPercap))
+ggplot(by_continent, aes(x = continent, y = medianGdpPercap)) +
+  geom_col()
+
+## Create a histogram of population (pop), with x on a log scale
+gapminder_1952 <- gapminder %>%
+filter(year == 1952)
+ggplot(gapminder_1952, aes(x = pop)) +
+  geom_histogram() +
+  scale_x_log10()
+
+## Create a boxplot comparing gdpPercap among continents
+gapminder_1952 <- gapminder %>%
+filter(year == 1952)
+ggplot(gapminder_1952, aes(x = continent, y = gdpPercap)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  ggtitle("gdp among continents") + # for the main title 
+  xlab("conti") + # for the x axis label
+  ylab("gdp") # for the y axis label
+
+
+
+
 
 
 
