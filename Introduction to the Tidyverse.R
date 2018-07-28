@@ -84,19 +84,3 @@ ggplot(gapminder_1952, aes(x = continent, y = gdpPercap)) +
   xlab("conti") + # for the x axis label
   ylab("gdp") # for the y axis label
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
