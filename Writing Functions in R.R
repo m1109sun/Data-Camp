@@ -273,7 +273,155 @@ map_dbl(cyl, ~ mean(.$disp))
 ## possibly() always succeeds, you give it a default value to return when there is an error
 ## quietly() captures printed output, messages, and warnings instead of capturing errors
 
-## 
+## Drawing samples from a Normal
+rnorm(5)
+rnorm(10)
+rnorm(20)
+map(list(5, 10, 20), rnorm)
+
+## Use map2() to iterate over two arguments
+rnorm(5, mean = 1)
+rnorm(10, mean = 5)
+rnorm(20, mean = 10)
+map2(list(5, 0, 20), list(1, 5, 10), rnorm)
+
+## pmap() to iterate over many arguments
+rnorm(5, mean = 1, sd = 0.1)
+rnorm(10, mean = 5, sd = 0.5)
+rnorm(20, mean = 10, sd = 0.1)
+pmap(list(n = list(5, 10, 20),
+          mean = list(1, 5, 10),
+          sd = list(0.1, 0.5, 0.1)), rnorm)
+
+## invoke_map() to iterate over functions
+rnorm(5)
+runif(5)
+rexp(5)
+invoke_map(list(rnorm, runif, rexp), n = 5)
+
+## Mapping over many arguments
+## map2 : iterate over two arguments
+## pmap : iterate over many arguments
+## invoke_map : iterate over functions and arguments
+
+## Side effects
+## Describe things that happen beyond the results of a function
+## Examples include : printing output, plotting, and saving files to disk
+## walk() operates just like map() except it's designed for functions that don't return anything. You use walk() for functions with side effects like printing, plotting or saving
+
+## Walk
+f <- list(Normal = "rnorm", Uniform = "runif", Exp = "rexp")
+params <- list( # define params
+  Normal = list(mean = 10),
+  Uniform = list(min = 0, max = 5),
+  Exp = list(rate = 5)
+)
+sims <- invoke_map(f, params, n = 50) # assign the simulated samples to sims
+walk(sims, hist) # use walk() to make a histogram of each element in sims
+
+## Walking over two or more arguments
+breaks_list <- list(
+  Normal = seq(6, 16, 0.5),
+  Uniform = seq(0, 5, 0.25),
+  Exp = seq(0, 1.5, 0.1)
+)
+walk2(sims, breaks_list, hist) # Use walk2() to make histograms with the right breaks
+
+## Putting together writing functions and walk
+find_breaks <- function(x) { # Turn this snippet into find_breaks()
+  rng <- range(x, na.rm = TRUE)
+  seq(rng[1], rng[2], length.out = 30)
+}
+find_breaks(sims[[1]]) # Call find_breaks() on sims[[1]]
+
+## Walking with many arguments : pwalk
+sims <- invoke_map(f, params, n = 1000)
+nice_breaks <- map(sims, find_breaks)
+nice_titles <- c("Normal(10, 1)", "Uniform(0, 5)", "Exp(5)")
+pwalk(list(x = sims, breaks = nice_breaks, main = nice_titles), hist, xlab = "")
 
 # Robust functions
+
+## Three main problems
+## Three-unstable functions
+## Non-standard evaluation
+## Hiddn arguments
+
+## Throwing errors
+x <- 1:10
+stopifnot(is.character(x)) # ()안의 값이 FALSE일 경우 process stop
+stopifnot(is.numeric(x))
+y <- c(1:10, "a")
+stopifnot(is.numeric(y))
+
+if (!is.character(x)) {
+  stop("'x' should be a character vector", call. = FALSE) 
+}
+
+# An informative error is even better
+x <- c(NA, NA, NA)
+y <- c( 1, NA, NA, NA)
+
+both_na <- function(x, y) {
+  if (length(x) != length(y)) {
+    stop("x and y must have the same length", call. = FALSE)
+  }  
+  sum(is.na(x) & is.na(y))
+}
+
+both_na(x, y)
+
+# Surprises due to unstable types
+## Type-inconsistent : the type of the return object depends on the input
+## Surprises occur when you've used a type-inconsistent function inside your own function
+
+# Two common solutions for [
+## Use drop = FALSE
+## Subset the data frame like a list : df[x]
+last_row <- function(df) {
+  df[nrow(df), , drop = FALSE]
+}
+df <- data.frame(x = 1:3)
+str(last_row(df))
+
+# What to do?
+## Write your own functions to be type-stable
+## Learn the common type-inconsistent functions in R
+## Avoid using type-inconsistent functions inside your own functions
+## Build a vocabulary of type-consistent functions
+
+# sapply is another common culprit (not good)
+## A will be a list, B will be a character matrix.
+df <- data.frame(
+  a = 1L,
+  b = 1.5,
+  y = Sys.time(),
+  z = ordered(1)
+)
+
+A <- sapply(df[1:4], class) 
+B <- sapply(df[3:4], class)
+
+# Using purrr solves the problem (good)
+library(purrr)
+## sapply calls
+A <- sapply(df[1:4], class) 
+B <- sapply(df[3:4], class)
+C <- sapply(df[1:2], class) 
+## Demonstrate type inconsistency
+str(A)
+str(B)
+str(C)
+## Use map() to define X, Y and Z
+X <- map(df[1:4], class)
+Y <- map(df[3:4], class)
+Z <- map(df[1:2], class)
+## Use str() to check type consistency
+str(X)
+str(Y)
+str(Z)
+
+# A hidden dependence
+options(stringsAsFactors = FALSE)
+getOption("stringsAsFactors")
 
