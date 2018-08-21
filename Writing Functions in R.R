@@ -358,7 +358,7 @@ if (!is.character(x)) {
   stop("'x' should be a character vector", call. = FALSE) 
 }
 
-# An informative error is even better
+## An informative error is even better
 x <- c(NA, NA, NA)
 y <- c( 1, NA, NA, NA)
 
@@ -371,11 +371,11 @@ both_na <- function(x, y) {
 
 both_na(x, y)
 
-# Surprises due to unstable types
+## Surprises due to unstable types
 ## Type-inconsistent : the type of the return object depends on the input
 ## Surprises occur when you've used a type-inconsistent function inside your own function
 
-# Two common solutions for [
+## Two common solutions for [
 ## Use drop = FALSE
 ## Subset the data frame like a list : df[x]
 last_row <- function(df) {
@@ -384,13 +384,13 @@ last_row <- function(df) {
 df <- data.frame(x = 1:3)
 str(last_row(df))
 
-# What to do?
+## What to do?
 ## Write your own functions to be type-stable
 ## Learn the common type-inconsistent functions in R
 ## Avoid using type-inconsistent functions inside your own functions
 ## Build a vocabulary of type-consistent functions
 
-# sapply is another common culprit (not good)
+## sapply is another common culprit (not good)
 ## A will be a list, B will be a character matrix.
 df <- data.frame(
   a = 1L,
@@ -402,26 +402,30 @@ df <- data.frame(
 A <- sapply(df[1:4], class) 
 B <- sapply(df[3:4], class)
 
-# Using purrr solves the problem (good)
+## Using purrr solves the problem (good)
 library(purrr)
+
 ## sapply calls
 A <- sapply(df[1:4], class) 
 B <- sapply(df[3:4], class)
 C <- sapply(df[1:2], class) 
+
 ## Demonstrate type inconsistency
 str(A)
 str(B)
 str(C)
+
 ## Use map() to define X, Y and Z
 X <- map(df[1:4], class)
 Y <- map(df[3:4], class)
 Z <- map(df[1:2], class)
+
 ## Use str() to check type consistency
 str(X)
 str(Y)
 str(Z)
 
-# A hidden dependence
+## A hidden dependence
 options(stringsAsFactors = FALSE)
 getOption("stringsAsFactors")
 
