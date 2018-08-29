@@ -64,7 +64,7 @@ ymd_hms("2015/08/25 13.33.09")
 
 ## Key functions in stringr for cleaning data
 library(stringr)
-str_trim("   this is a test   ")
+str_trim("   this is a test   ") 
 str_pad("24493", width = 7, side = "left", pad = "0")
 friends <- c("Sarah", "Tom", "Alice")
 str_detect(friends, "Alice")
@@ -120,3 +120,7 @@ df2 <- data.frame(A = rnorm(100, 50, 10),
 summary(df2)
 hist(df2$B, greaks = 20)
 boxplot(df2)
+
+
+
+aaaaaa
