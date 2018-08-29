@@ -121,6 +121,3 @@ summary(df2)
 hist(df2$B, greaks = 20)
 boxplot(df2)
 
-
-
-aaaaaa
